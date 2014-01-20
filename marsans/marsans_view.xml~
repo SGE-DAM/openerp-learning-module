@@ -1,0 +1,316 @@
+<?xml version="1.0"?>
+<openerp>
+<data>
+
+    <record model="ir.ui.view" id="view_marsans_city_form">
+        <field name="name">marsans.city.form</field>
+        <field name="model">marsans.city</field>
+
+        <field name="arch" type="xml">
+            <form string="marsans.city" version="7.0">
+		<sheet>
+			<field name="image" widget="image" class="oe_avatar oe_left"/>
+				<group><field name="name" select="1"/>
+				<field name="hotels" colspan="4" select="2"/></group>
+		</sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_marsans_city_tree">
+        <field name="name">marsans.city.tree</field>
+        <field name="model">marsans.city</field>
+
+        <field name="arch" type="xml">
+            <tree string="marsans.city">
+				<field name="name"/>
+
+            </tree>
+        </field>
+    </record>
+    <record model="ir.actions.act_window" id="action_marsans_city">
+        <field name="name">Cities</field>
+        <field name="res_model">marsans.city</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+   
+
+        
+    <record model="ir.ui.view" id="view_marsans_hotel_form">
+        <field name="name">marsans.hotel.form</field>
+        <field name="model">marsans.hotel</field>
+
+        <field name="arch" type="xml">
+            <form string="marsans.hotel" version="7.0">
+		<sheet>
+
+				 <field name="image" widget="image" class="oe_avatar oe_left"/>
+		<group>
+				<field name="name" />
+				<field name="partner" domain="[('supplier','=',True)]"/>
+ 	
+				<field name="price" />
+				<field name="city_id" />
+		</group>
+		 <notebook>
+                            <page string="Gallery">
+				<field name="gallery" mode="kanban,tree">
+				 <kanban>
+                    <!--list of field to be loaded -->
+                    <field name="name" />
+                    <field name="image" />
+		   
+                    <templates>
+                    <t t-name="kanban-box">
+                            <div class="oe_product_vignette">
+                                <a type="open">
+                                    <img class="oe_kanban_image" style="width:300px; height:auto;"
+                                        t-att-src="kanban_image('marsans.hotel.galley', 'image', record.id.value)" />
+                                </a>
+                                <div class="oe_product_desc">
+                                    <h4>
+                                        <a type="edit">
+                                            <field name="name"></field>
+                                        </a>
+                                    </h4>
+                                    
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+				</field>
+			    </page>
+			    <page string="Rooms">
+			    	<field name="rooms"/>
+			    </page>
+		</notebook>
+                 </sheet>
+            </form>
+        </field>
+    </record>
+    <record model="ir.ui.view" id="view_marsans_hotel_tree">
+        <field name="name">marsans.hotel.tree</field>
+        <field name="model">marsans.hotel</field>
+
+        <field name="arch" type="xml">
+            <tree string="marsans.hotel">
+				<field name="name"/>
+				<field name="price"/>
+				<field name="city_id"/>
+
+            </tree>
+        </field>
+    </record>
+
+    <record model="ir.ui.view" id="view_marsans_hotel_kanban">
+        <field name="name">marsans.hotel.kanban</field>
+        <field name="model">marsans.hotel</field>
+
+        <field name="arch" type="xml">
+		 <kanban>
+                    <!--list of field to be loaded -->
+                    <field name="name" />
+                    <field name="image" />
+		    <field name="city_id"/>
+
+                    <templates>
+                    <t t-name="kanban-box">
+                            <div class="oe_product_vignette">
+                                <a type="open">
+                                    <img class="oe_kanban_image"
+                                        t-att-src="kanban_image('marsans.hotel', 'image', record.id.value)" />
+                                </a>
+                                <div class="oe_product_desc">
+                                    <h4>
+                                        <a type="edit">
+                                            <field name="name"></field>
+                                        </a>
+                                    </h4>
+                                    <ul>
+                                       <li>Price: <field name="price"></field></li>
+				       <li>City: <field name="city_id"></field></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </t>
+                    </templates>
+                </kanban>
+        </field>
+    </record>
+
+    <record model="ir.actions.act_window" id="action_marsans_hotel">
+        <field name="name">Hotels</field>
+        <field name="res_model">marsans.hotel</field>
+        <field name="view_type">form</field>
+        <field name="view_mode">tree,form,kanban</field>
+    </record>
+    
+        
+ <record model="ir.ui.view" id="view_marsans_travel_form">
+        <field name="name">marsans.travel.form</field>
+        <field name="model">sale.order</field>
+        <field name="inherit_id" ref="sale.view_order_form"/>
+        <field name="arch" type="xml">
+            
+		
+		<notebook position="inside" >
+		<page string="Travel" >
+				<label string="is a Travel" /><field name="istravel" />
+				
+				<field name="scales" domain="[('travel_id','=',id)]" mode="tree,graph" > 
+			
+			<graph string="Scale Costs" orientation="vertical" type="bar">
+ 			<field name="order_n" group="False"/>
+ 			<field name="total" />
+ 			</graph>
+			</field>
+			<field name='total' />
+			<field name='state' invisible='1'/>
+			</page>
+		</notebook>	
+          
+        </field>
+    </record> 
+    
+    <record model="ir.ui.view" id="view_marsans_travel_tree">
+        <field name="name">marsans.travel.tree</field>
+        <field name="model">sale.order</field>
+  <!-- <field name="inherit_id" ref="sale.view_order_tree"/> -->
+        <field name="arch" type="xml">
+           <tree string="Sales Orders" >
+				<field name="name" />
+				<field name="partner_id" />
+				<field name='total'/>
+				<field name='state' invisible='1'/>
+
+            </tree> 
+        </field>
+    </record> 
+  
+    <record model="ir.actions.act_window" id="action_marsans_travel_2">
+        <field name="name">Travels</field>
+        <field name="res_model">sale.order</field>
+        <field name="domain">[('istravel','=',True)]</field>
+        <field name="view_mode">tree,form</field>
+    </record>
+    
+     <record model="ir.actions.act_window.view" id="action_marsans_travel_2_vista">
+        <field name="sequence" eval="1"/>
+        <field name="view_mode">tree</field>
+        <field name="view_id" ref="view_marsans_travel_tree"/>
+        <field name="act_window_id" ref="action_marsans_travel_2"/>
+    </record>
+   
+
+        
+    <record model="ir.ui.view" id="view_marsans_scale_form">
+        <field name="name">marsans.scale.form</field>
+        <field name="model">sale.order.line</field>
+        <field name="inherit_id" ref="sale.view_order_line_form2"/>
+        <field name="arch" type="xml">
+            
+		
+				<group position="inside">
+				<field name="order_id"  domain="[('istravel','=',True)]"/>
+				<field name="order_n" />
+				<field name="city" on_change="get_hotels(city)"/>
+				<field name="hotel" on_change="get_rooms(hotel)"/>
+				<!--<field name="room"  domain="[('isroom','=',True)]"/>-->
+				<field name="product_id"  domain="[('isroom','=',True)]"/>
+			 <field name="date_i" />
+				<field name="end" /><field name="days"/></group>
+				<field name="product_id"  position="replace"/>
+				<h2 position="replace"/><h1 position="replace"/>
+				<label for="order_id" position="replace"/>
+				
+				
+		
+          
+        </field>
+    </record>
+    
+    <record model="ir.ui.view" id="view_marsans_scale_tree">
+        <field name="name">marsans.scale.tree</field>
+        <field name="model">sale.order.line</field>
+
+        <field name="arch" type="xml">
+            <tree string="marsans.scale">
+				<field name="order_n"/>
+				<field name="hotel"/>
+				<!--<field name="room" />-->
+				<field name="end"/>
+				<field name="date_i"/>
+				<field name="days"/>
+				<field name="price"/>
+				<field name="total"/>
+				<field name="order_id"/><field name='state' invisible='1'/>
+
+            </tree>
+        </field>
+    </record>
+
+	<record model="ir.ui.view" id="view_marsans_scale_calendar">
+		<field name="name">marsans.scale.calendar</field>
+		<field name="model">sale.order.line</field>
+		<field name="arch" type="xml">
+		<calendar string="Scales" color="order_id" date_start="date_i" date_stop="end">
+			<field name="order_n"/>
+			<field name="hotel"/>
+			<field name="order_id"/>
+		</calendar>
+		</field>
+	</record>
+
+
+	<record model="ir.ui.view" id="view_marsans_scale_graph">
+  		<field name="name">marsans.scale.graph</field>
+ 		<field name="model">sale.order.line</field>
+ 		<field name="arch" type="xml">
+		<graph string="Scale Costs" orientation="vertical" type="bar">
+ 			<field name="order_n" group="False"/>
+ 			<field name="total" operator="+"/>
+ 		</graph>
+ 		</field>
+ 		</record>
+
+ <record model="ir.actions.act_window" id="action_marsans_scale">
+        <field name="name">Scales</field>
+        <field name="res_model">sale.order.line</field>
+
+        <field name="view_mode">calendar</field>
+    </record>
+    
+    <record model="ir.ui.view" id="view_marsans_room_form">
+    <field name="name">product.product.form.inherit</field>
+    <field name="model">product.product</field>
+    <field name="inherit_id" ref="product.product_normal_form_view"/>
+    <field name="arch" type="xml">
+    <notebook position="inside">
+            <page string="Rooms">
+             <group>
+				<field name="isroom"/>
+				<field name="hotel"/>
+				<field name="price_night" />
+				<field name="m2"/>
+				<field name="beds"/>
+				<field name="ac"/>
+				<field name="bathroom"/><field name="bed_image"/></group>
+				</page>
+        </notebook>
+    </field>
+</record>
+
+
+    
+    
+
+<menuitem name="Marsans" id="menu_marsans"/>
+<menuitem name="Database" id="menu_database" parent="menu_marsans"/>
+<menuitem name="Travels" id="menu_database_travels" parent="menu_database" action="action_marsans_travel_2" /> 
+<menuitem name="Hotels" id="menu_database_hotels" parent="menu_database" action="action_marsans_hotel" />
+<menuitem name="Cities" id="menu_database_cities" parent="menu_database" action="action_marsans_city"/>
+<menuitem name="Scales Calendar" id="menu_database_scales" parent="menu_database" action="action_marsans_scale"/>
+</data>
+</openerp>
+	

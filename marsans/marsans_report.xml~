@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+    <report id="marsans.report_scale"
+            name="marsans.scale.webkit"
+            auto="False"
+            model="marsans.scale"
+            file="marsans/report/scale.mako"
+            string="Scales"
+            webkit_header="base_headers_webkit.base_reports_portrait_header"
+            report_type="webkit"/>
+     <report id="marsans.report_travel"
+            name="marsans.travel.webkit"
+            auto="False"
+            model="marsans.travel"
+            file="marsans/report/travel.mako"
+            string="Travels"
+            webkit_header="marsans.marsans_report_header"
+            report_type="webkit"/>
+    
+
+  </data>
+</openerp>
