@@ -9,6 +9,6 @@ It also offers a calendar and a tool for finding hotels or scales too expensive.
         "depends" : ['base','report_webkit','product','sale'],
         "init_xml" : [ ],
         "demo_xml" : [ ],
-        "update_xml" : ['marsans_view.xml', 'marsans_report.xml', 'report/header_marsans.xml'],
+        "update_xml" : ['report/header_marsans.xml', 'marsans_view.xml', 'marsans_report.xml' ],
         "installable": True
 }

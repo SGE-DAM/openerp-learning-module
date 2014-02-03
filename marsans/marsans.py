@@ -95,6 +95,7 @@ class marsans_travel(osv.osv):
 			total=0
 			for s in h.scales:
 				total=total+s.total
+				#print s.total
 			result[h.id]=total
 		return result
 		
@@ -104,7 +105,8 @@ class marsans_travel(osv.osv):
 	_columns = {
 		#'name': fields.char('Name', size=64, required=True),
 		#'partner_id': fields.many2one('res.partner', 'Client'),
-		'scales': fields.one2many('sale.order.line', 'order_id', 'Scales'),
+
+		'scales': fields.one2many('sale.order.line', 'order_id', 'Scales',domain=[('isscale','=',True)]),
 		'total': fields.function(_compute_total_price, type='float', method=True, string='Total',store=False),
 		'istravel' : fields.boolean('Is a travel'),
 	}
@@ -116,19 +118,23 @@ class marsans_scale(osv.osv):
 	def _compute_days(self, cr, uid, ids, field_name, arg, context=None):
 		result = {}
 		for h in self.browse(cr, uid, ids, context=None):
-			dias = 0
-			d1 = datetime.strptime(h.end, '%Y-%m-%d %H:%M:%S')
-			d0 = datetime.strptime(h.date_i, '%Y-%m-%d %H:%M:%S')
-			dias = abs((d1-d0).days)
-			result[h.id] = dias
+			if h.isscale == True:
+				dias = 0
+				d1 = datetime.strptime(h.end, '%Y-%m-%d %H:%M:%S')
+				d0 = datetime.strptime(h.date_i, '%Y-%m-%d %H:%M:%S')
+				dias = abs((d1-d0).days)
+				result[h.id] = dias
 		return result
 
 	def _compute_price(self, cr, uid, ids, field_name, arg, context=None):
 		result = {}
 		for h in self.browse(cr, uid, ids, context=None):
-			result[h.id] = h.days * h.price
-			self.write(cr,uid,h.id,{'price_unit': h.price,'product_uom_qty': h.days})
-			print result[h.id]
+			if h.isscale == True:
+				result[h.id] = h.days * h.price
+				self.write(cr,uid,h.id,{'price_unit': h.price,'product_uom_qty': h.days})
+				#print result[h.id]
+			else:
+				result[h.id] = 0
 		return result
 		
 	def get_hotels(self, cr, uid, ids, city, context=None): #https://doc.openerp.com/6.1/developer/03_modules_3/#onchange-event-link
@@ -139,40 +145,50 @@ class marsans_scale(osv.osv):
 		h=self.pool.get('marsans.hotel').browse(cr,uid,hotel)
 		return {'domain':{'product_id':[('hotel','=',h.id)]}}
 		
-	def check_datei(self,cr,uid,ids,date_i,context=None):
+	def check_datei(self,cr,uid,ids,date_i,order_id,id,context=None):
 		res={}
-	#	escalas=self.pool.get('sale.order').browse(cr,uid,order_id).scales
-	#	for i in escalas:
-	#		print i.date_i
-		
-		#res = {'warning':{'tile':'Error de fechas','message':'Esa fecha es de otra escala'}}
-		res['warning'] = {'title': 'Error de fechas', 'message': 'Este dia ya forma parte de otra escala'} 
-		#res['value'] = {'date_i':fields.datetime.now()}
+		escalas=self.pool.get('sale.order').browse(cr,uid,order_id).scales
+		for i in escalas:
+			#print i.date_i
+			d1 = datetime.strptime(i.end, '%Y-%m-%d %H:%M:%S')
+			d0 = datetime.strptime(i.date_i, '%Y-%m-%d %H:%M:%S')
+			di = datetime.strptime(date_i, '%Y-%m-%d %H:%M:%S')
+			if (id != i.id) & (d0 < di) & (d1 > di):
+					print i.order_n		
+					res['warning'] = {'title': 'Error de fechas', 'message': 'Este dia ya forma parte de otra escala'} 
+					res['value'] = {'date_i':fields.datetime.now()}
 		
 		return res 
+
+	def check_datee(self,cr,uid,ids,end,order_id,id,context=None):
+		res={}
+		escalas=self.pool.get('sale.order').browse(cr,uid,order_id).scales
+		for i in escalas:
+			#print i.date_i
+			d1 = datetime.strptime(i.end, '%Y-%m-%d %H:%M:%S')
+			d0 = datetime.strptime(i.date_i, '%Y-%m-%d %H:%M:%S')
+			de = datetime.strptime(end, '%Y-%m-%d %H:%M:%S')
+			if (id != i.id) & (d0 < de) & (d1 > de):
+					print i.order_n		
+					res['warning'] = {'title': 'Error de fechas', 'message': 'Este dia ya forma parte de otra escala'} 
+					res['value'] = {'end':fields.datetime.now()}
 		
-	#def _def_sel_cities(self, cr, uid, context=None):
-	#	res=[] #http://help.openerp.com/question/21529/how-to-extend-fieldsselection-options-without-overwriting-them/
-	#	totes=self.pool.get('marsans.city').search(cr,uid,[])
-	#	citis=self.pool.get('marsans.city').browse(cr,uid,totes,context=None)
-	#	for i in citis:
-		#	res.append((i.id,i.name))	
-		#print(res)
-	#	return[(r[0],r[1]) for r in res] 
-		#http://stackoverflow.com/questions/16578570/many-to-one-relation-not-working-in-fields-selection-in-openerp
-	"""def _def_sel_hotels(self, cr, uid, context=None):
-		res=[]
-		totes=self.pool.get('marsans.hotel').search(cr,uid,[])
-		citis=self.pool.get('marsans.hotel').browse(cr,uid,totes,context=None)
-		for i in citis:
-			res.append((i.id,i.name))	
-		
-		return[(r[0],r[1]) for r in res] 
-		"""	
+		return res 
+
+	def check_iend(self, cr, uid, ids, context=None):
+		for h in self.browse(cr, uid, ids, context=None):
+			if h.isscale == True:
+				d1 = datetime.strptime(h.end, '%Y-%m-%d %H:%M:%S')
+				d0 = datetime.strptime(h.date_i, '%Y-%m-%d %H:%M:%S')			
+				if d0 > d1:
+					return False
+		return True
+
 	#_name = 'marsans.scale'
 	_inherit='sale.order.line'
 	_order = "order_id,order_n"
 	_columns = {
+		'isscale': fields.boolean('Is Scale'),
 		'order_n': fields.integer('Order', required=True),
 		#'travel_id': fields.many2one('sale.order','Travel',required=True),
 		'city': fields.many2one('marsans.city','City'),
@@ -188,5 +204,8 @@ class marsans_scale(osv.osv):
 	_defaults = {
 		'name':'Escala',
 	}
+	_constraints = [
+		(check_iend,'El dia que comenca una escala no pot ser posterior al final',['datei','end']),	
+	]
 marsans_scale()
 

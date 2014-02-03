@@ -54,63 +54,63 @@
 		</group>
 		 <notebook>
                             <page string="Gallery">
-				<field name="gallery" mode="kanban,tree">
+				<field name="gallery" mode="kanban,tree" context="{'default_hotel_id':active_id}">
 				 <kanban>
-                    <!--list of field to be loaded -->
-                    <field name="name" />
-                    <field name="image" />
+				 <!--list of field to be loaded -->
+				 <field name="name" />
+				 <field name="image" />
 		   
-                    <templates>
-                    <t t-name="kanban-box">
-                            <div class="oe_product_vignette">
-                                <a type="open">
-                                    <img class="oe_kanban_image" style="width:300px; height:auto;"
-                                        t-att-src="kanban_image('marsans.hotel.galley', 'image', record.id.value)" />
-                                </a>
-                                <div class="oe_product_desc">
-                                    <h4>
-                                        <a type="edit">
-                                            <field name="name"></field>
-                                        </a>
-                                    </h4>
-                                    
-                                </div>
-                            </div>
-                        </t>
+				 <templates>
+				 <t t-name="kanban-box">
+					 <div class="oe_product_vignette">
+					 <a type="open">
+					    <img class="oe_kanban_image" style="width:300px; height:auto;"
+						t-att-src="kanban_image('marsans.hotel.galley', 'image', record.id.value)" />
+					</a>
+					<div class="oe_product_desc">
+					    <h4>
+						<a type="edit">
+						    <field name="name"></field>
+						</a>
+					    </h4>
+					    
+					</div>
+				    </div>
+				    </t>
                     </templates>
                 </kanban>
 				</field>
 			    </page>
 			    <page string="Rooms">
-			   	<field name="rooms" mode="kanban,tree">
+			   	<field name="rooms" mode="kanban,tree" context="{'default_hotel':active_id}">
 			   	 <kanban>
-                    <!--list of field to be loaded -->
-                    <field name="name" />   <field name="beds" />
-                    <field name="bathroom" />
-		    <field name="bed_image" />
-                    <templates>
-                    <t t-name="kanban-box">
-                            <div class="oe_product_vignette" style="border: 1px solid #aaa; padding: 10px; ">
-                                <a type="open">
-                                    <img class="oe_kanban_image" style="width:300px; height:auto;"
-                                        t-att-src="kanban_image('marsans.room', 'bathroom', record.id.value)" />
-                                        <img class="oe_kanban_image" style="width:300px; height:auto;"
-                                        t-att-src="kanban_image('marsans.room', 'bed_image', record.id.value)" />
-                                </a>
-                                <br/>
-                                <div >
-                                   
-                                        <a type="edit">
-                                            <field name="name"></field>
-                                            <field name="beds" />
-                                        </a>
-                                    
-                                    
-                                </div>
-                            </div>
-                        </t>
-                    </templates>
-                </kanban>
+			   	 <!--list of field to be loaded -->
+				    <field name="name" />   <field name="beds" />
+				    <field name="bathroom" />
+				    <field name="bed_image" />
+				    <templates>
+				    <t t-name="kanban-box">
+					    <div class="oe_product_vignette" style="border: 1px solid #aaa; padding: 10px; ">
+						<a type="open">
+						    <img class="oe_kanban_image" style="width:300px; height:auto;"
+							t-att-src="kanban_image('marsans.room', 'bathroom', record.id.value)" />
+							<img class="oe_kanban_image" style="width:300px; height:auto;"
+							t-att-src="kanban_image('marsans.room', 'bed_image', record.id.value)" />
+						</a>
+						<br/>
+						<div >
+						   
+							<a type="edit">
+							    <field name="name"></field>
+							    <field name="beds" />
+							</a>
+						    
+						    
+						</div>
+					    </div>
+					</t>
+				    </templates>
+				</kanban>
 			   	<tree>
 			   	<field name="isroom"/>
 				<field name="hotel"/>
@@ -193,33 +193,30 @@
 		
 		<notebook position="inside" >
 		<page string="Travel" >
-				<label string="is a Travel" /><field name="istravel" />
+			<group><field name="istravel" />
 				
-				<field name="scales" domain="[('order_id','=',id)]" mode="tree" > 
+			<field name="scales" domain="[('order_id','=',active_id)]" context="{'default_order_id':active_id,'default_isscale':True}" mode="tree" > 
 			
-			<!-- <graph string="Scale Costs" orientation="vertical" type="bar">
- 			<field name="order_n" group="False"/>
- 			<field name="total" />
- 			</graph> -->
  			
  			 <tree string="marsans.scale" editable="bottom" >
-				<field name="order_n"/>
+				<field name="order_n"/> <field name="id" invisible='1'/>
+				<field name="isscale" invisible='1'/>
 				<field name="city" on_change="get_hotels(city)"/>
 				<field name="hotel" on_change="get_rooms(hotel)"/>
 				<field name="product_id"  domain="[('isroom','=',True)]"/>
 				
-				<field name="date_i" on_change="check_datei(date_i)"/>
-				<field name="end"/>
+				<field name="date_i" on_change="check_datei(date_i,order_id,id)"/>
+				<field name="end" on_change="check_datee(end,order_id,id)"/>
 				<field name="days"/>
 				<field name="price"/>
 				<field name="total"/>
-				<field name="order_id" domain="[('istravel','=',True)]"/>
+				<field name="order_id" invisible='1'/> 
 				<field name='state' invisible='1'/> <field name='name' invisible='1' />
 
 				</tree>
 			</field>
 			<field name='total' />
-			<field name='state' invisible='1'/>
+			<field name='state' invisible='1'/></group>
 			</page>
 		</notebook>	
           
@@ -284,29 +281,7 @@
           
         </field>
     </record>
-    
-  <!--  <record model="ir.ui.view" id="view_marsans_scale_tree">
-        <field name="name">marsans.scale.tree</field>
-        <field name="model">sale.order.line</field>
 
-        <field name="arch" type="xml">
-            <tree string="marsans.scale" editable="bottom" >
-				<field name="order_n"/>
-				<field name="city" on_change="get_hotels(city)"/>
-				<field name="hotel" on_change="get_rooms(hotel)"/>
-				<field name="product_id"  domain="[('isroom','=',True)]"/>
-				
-				<field name="date_i" on_change="check_datei(date_i)"/>
-				<field name="end"/>
-				<field name="days"/>
-				<field name="price"/>
-				<field name="total"/>
-				<field name="order_id" domain="[('istravel','=',True)]"/>
-				<field name='state' invisible='1'/> <field name='name' invisible='1' />
-
-            </tree>
-        </field>
-    </record> -->
 
 	<record model="ir.ui.view" id="view_marsans_scale_calendar">
 		<field name="name">marsans.scale.calendar</field>
@@ -360,25 +335,6 @@
    </xpath>
     </field>
 </record>
-
- <!--   <record model="ir.ui.view" id="view_marsans_room_tree">
-    <field name="name">product.product.tree.inherit</field>
-    <field name="model">product.product</field>
-    <field name="inherit_id" ref="product.product_product_tree_view"/>
-    <field name="arch" type="xml">
-     <tree string="Products" position="replace">
-				<field name="hotel"/>
-				<field name="price_night" />
-				<field name="m2"/>
-				<field name="beds"/>
-				<field name="ac"/>
-				
-				 </tree>
-    </field>
-    
-    https://doc.openerp.com/6.0/developer/2_6_views_events/views/specify_view_to_use/
-</record> -->
-
 
 
     
